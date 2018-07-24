@@ -8,6 +8,7 @@ from gtts import gTTS
 from __configure.mubby_value import TTS_FILE_NAME
 
 
+# 어떻게 동작하는지 확인할 것
 class TextToSpeech:
     def __init__(self):
         pass

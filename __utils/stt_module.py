@@ -6,6 +6,8 @@ import sys
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+# [END import_libraries]s
+
 import speech_recognition as sr
 
 from __configure.mubby_value import STT_FILE_NAME
@@ -136,4 +138,5 @@ class SpeechToText:
 
             # Now, put the transcription responses to use.
             stt_text = self.listen_print_loop(responses)
+            # 아무말도 안 하면 어떻게 될까 궁금하네 해보자.
             return stt_text

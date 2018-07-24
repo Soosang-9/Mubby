@@ -1,6 +1,7 @@
 import os
 
 from __utils.aibril_connector import WatsonConversation
+from __utils.socket_module import SocketAction
 from __utils import audio_converter
 
 from __configure.mubby_value import *
@@ -10,7 +11,6 @@ from __utils.tts_module import TextToSpeech
 __aibril = WatsonConversation()
 __stt = SpeechToText()
 __tts = TextToSpeech()
-
 
 def understand_func(client_info, socket_action=None):
     if socket_action:
