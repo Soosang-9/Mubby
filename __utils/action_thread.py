@@ -14,22 +14,16 @@ from __utils.socket_module import SocketAction
 def action_thread(client_info=None):
     socket_action = SocketAction(client_info)
 
-    # while client_info['request_socket_from_client']:
     if client_info:
-        try:
-            # 01. STT Streaming
-            header, language = understand_func(client_info, socket_action)
-            print("header >> {}\nlanguage >> {}".format(header, language))
-        except Exception as e:
-            print('\t★ default function error >> {}'.format(e))
 
-        try:
-            # 02. What should the server do?
-            # Aibril 의 header.command 를 이용하여 어떤 동작을 할 것인지 정한다.
+        # 01. STT Streaming
+        header, language = understand_func(client_info, socket_action)
+        print("header >> {}\nlanguage >> {}".format(header, language))
 
+        # 02. What should the server do?
+        try:
             if header['command'] == "chat":
-                # tts 에 다녀온다.
-                response_func(client_info)
+                response_path = response_func(client_info)
 
             elif header['command'] == "weather":
                 # aibril 과 대화를 한 번 더 하고 tts 에 다녀온다.
@@ -40,21 +34,19 @@ def action_thread(client_info=None):
                 # ps. 클라이언트와 상의해보고 동작방법을 바꿔야 할 수도 있다.
                 output_audio_path = music_func()
             else:
-                print("기본 음성 들어가게 해야하는데ㅔㅔㅔㅔㅔ")
+                raise AttributeError
                 # 잘못된 접근이라는 것을 알려주어야 한다.
-
-        except Exception as e:
-            print('\t★ 함수명 function error >> {}'.format(e))
+        except Exception as exc:
+            # tts 동작을 하지 않고 그냥 파일을 보내준다, header 가 잘못 되었으니까
+            print('★ACTION: what sholud the server do [ {} ]'.format(exc))
 
         try:
             # < The server sent data to client_info >
-            # 음성 파일을 돌려주어야 한다. (확인)
-            # output_audio_path = "__user_audio/"+sock.getpeername()[0] + "/output_tts.wav"
-            print("out_audio_path >> {}".format(client_info['folder_path'] + RESPONSE_FILE_NAME))
-            socket_action.sending_wav(RESPONSE_FILE_NAME)
+            print("out_audio_path >> {}".format(response_path))
+            socket_action.sending_wav(response_path)
 
-        except Exception as e:
-            print('\t★ __send time out error >> {}'.format(e))
+        except Exception as exc:
+            print('\t★ACTION: sending_wav [ {} ]'.format(exc))
 
         finally:
              if socket_action.closing():

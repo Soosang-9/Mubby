@@ -13,23 +13,25 @@ class TextToSpeech:
     def __init__(self):
         pass
 
-    def text_to_speech(self, client_info, tts_api=None):
+    def text_to_speech(self, client_info, tts_api='aws_polly'):
+
         tts_speech = client_info['folder_path'] + TTS_FILE_NAME
         text = client_info['watson_response']
-        print('watson_response {} '.format(text))
 
-        if tts_api:
-            if tts_api == "google":
+        try:
+            if tts_api == 'google':
                 self.google_tts(text, tts_speech)
-            elif tts_api == "naver_clova":
+            elif tts_api == 'naver_clova':
                 self.naver_tts(text, tts_speech)
-            elif tts_api == "aws_polly":
+            elif tts_api == 'aws_polly':
                 self.aws_tts(text, tts_speech)
             else:
-                print("그런 건 없어 폴리 시켜줄게")
-                self.aws_tts(text, tts_speech)
-        else:
-            self.aws_tts(text, tts_speech)
+                raise AttributeError
+
+        except Exception as exc:
+            # 기본 경로로 해서 에러 메시지 반환하게 해야한다.
+            tts_speech = None
+            print('TTS:text_to_speech [ {} ]'.format(exc))
 
         return tts_speech
 

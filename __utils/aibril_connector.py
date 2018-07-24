@@ -8,14 +8,10 @@ from __configure.mubby_value import WATSON
 
 class WatsonConversation:
     def __init__(self):
-        # 환경변수가 설정 안 되어있을 때도 에러를 반환해야한다.
-
-        # client 마다 객체에 context 를 넣었다가 호출해야하는 것은 아닐까?
-        # 대화가 이어지기 위해서는 이전의 context 값이 필요하다.
-        # Aibril 에 접근하기 위해서는 watson id 가 필요하다.
-
         self.__watson_conv_id = ''
         self.__convert = None
+
+        self.connect()
 
     def connect(self):
         try:
@@ -27,27 +23,29 @@ class WatsonConversation:
             )
 
         except Exception as e:
+            self.__convert = None
             print("can not connect Aibril conversation server >> {}".format(e))
-            return False
-
-        return True
 
     def conversation(self, client_info):
-        is_succeed = True
 
         stt_text = client_info['stt_text']
         context = client_info['watson_context']
 
-        if self.__convert is None:
-            is_succeed = self.connect()
-
-        if is_succeed:
-
+        try:
             response = self.__convert.message(
                 workspace_id=WATSON['watson_workspace'],
                 message_input={'text': stt_text},
                 context=context
             )
+        except Exception as e:
+            self.connect()
+            print('AIBRIL: conversation [ {} ]'.format(e))
+
+            header = {'command': 'chat'}
+            language = 'ko'
+            watson_response = '에이브릴에 접속할 수가 없어요'
+
+        else:
 
             # response type 출력 해볼 것, json parsing 이 딱히 필요 없을 수도
             json_response = json.dumps(response, indent=2, ensure_ascii=False)
@@ -116,11 +114,6 @@ class WatsonConversation:
                 language = 'ko'
             # --------------------------------------------------
 
-            client_info['watson_response'] = result_conv
+            watson_response = result_conv
 
-        else:
-            header = {'command': 'chat'}
-            language = 'ko'
-            client_info['watson_response'] = '에이브릴에 접속할 수가 없어요'
-
-        return header, language
+        return header, language, watson_response

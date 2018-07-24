@@ -1,5 +1,5 @@
 from copy import deepcopy
-import multiprocessing
+from multiprocessing import Process
 # 시간을 나타내기 위해서 사용
 
 from _thread import start_new_thread
@@ -12,7 +12,8 @@ from __utils.socket_module import Socket
 from __utils.action_thread import action_thread
 
 
-class RequestProcess(multiprocessing.Process):
+class RequestProcess(Process):
+    """ multiprocessing for voice service """
     def __init__(self):
         super(RequestProcess, self).__init__()
         self.__request_process = None
@@ -21,24 +22,24 @@ class RequestProcess(multiprocessing.Process):
         self.__request_process = Handler()
 
 
-class Handler:
+class Handler(object):
+    """ process handler """
     def __init__(self):
         self.__request_socket = Socket(REQUEST_ADDR).getting_server()
-
-        print(" SERVER is running {}".format('-'*10))
         self.handler()
 
+        print(" SERVER is running {}".format('-'*10))
+
     def handler(self):
+        """ handler start """
         primary_key = 1
 
         while self.__request_socket:
             # 00. Initialize a client_info
             client_info = deepcopy(CLIENT)
-            # 로그로 수정해야하는 부분
-            print("-")
             try:
                 # 01. First connect for setting request_socket_from_client
-                request_socket_from_client, client_ip = self.__request_socket.accept()
+                request_socket_from_client = self.__request_socket.accept()[0]
 
                 # 02. Comparison a client_serial_number and DB_records
                 #   - if the same : return primary key

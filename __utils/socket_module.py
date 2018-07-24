@@ -32,8 +32,6 @@ class Socket:
 class SocketAction:
     def __init__(self, client_info):
         self.__client = client_info['request_socket_from_client']
-        self.__audio_path = client_info['folder_path']
-
         # Client에 socket option을 지정해 준다.
         self.__client.settimeout(2)
 
@@ -70,8 +68,7 @@ class SocketAction:
         except:
             return False
 
-    def sending_wav(self, file_name):
-        audio_path = self.__audio_path + file_name
+    def sending_wav(self, audio_path):
         answer = self.receiving()
         if answer == b'tel':
             with open(audio_path, "rb") as wave_file:
