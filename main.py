@@ -1,6 +1,8 @@
+from os import system
+
+from __process.logging_process import *
 from __process.request_process import RequestProcess
 from __process.schedule_process import Scheduling
-from __process.logging_process import *
 
 
 class Main:

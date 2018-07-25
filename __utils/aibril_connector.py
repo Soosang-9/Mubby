@@ -8,7 +8,6 @@ from __configure.mubby_value import WATSON
 
 class WatsonConversation:
     def __init__(self):
-        self.__watson_conv_id = ''
         self.__convert = None
 
         self.connect()

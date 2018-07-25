@@ -31,7 +31,8 @@ FILE_HEADER_SIZE = 44
 FILE_READ_SIZE = 8192
 BUF_SIZE = 1024
 
-WATSON = {'watson_username': '', 'watson_password': '', 'watson_workspace': '', 'watson_url': '', 'watson_version': ''}
+WATSON = {'watson_username': '', 'watson_password': '',
+          'watson_workspace': '', 'watson_url': '', 'watson_version': ''}
 for key, value in watson_environment():
     WATSON[key] = value
 
