@@ -28,3 +28,7 @@ output_gtts\.mp3
 2channel_record\.wav
 
 output_atts\.raw
+
+__configure/Mubby-22fcbddada2c\.json
+
+__configure/environment\.sh
