@@ -2,10 +2,8 @@ from os import getenv, system
 import subprocess
 
 def google_environment():
-    watson_environment()
     key = 'GOOGLE_APPLICATION_CREDENTIALS'
     google_value = getenv(key)
-    print('google vlaue {}'.format(google_value))
     if google_value is not None:
         return google_value
     else:
@@ -18,7 +16,6 @@ def watson_environment():
 
     for key in watson_key:
         watson_value = getenv(key)
-        print(watson_value)
         if watson_value is not None:
             yield key, watson_value
         else:
