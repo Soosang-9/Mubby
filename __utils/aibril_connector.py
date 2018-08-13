@@ -8,9 +8,9 @@ from __configure.mubby_value import WATSON
 
 class WatsonConversation:
     def __init__(self):
-
-        self.__watson_conv_id = ''
         self.__convert = None
+
+        self.connect()
 
     def connect(self):
         try:
@@ -22,27 +22,29 @@ class WatsonConversation:
             )
 
         except Exception as e:
+            self.__convert = None
             print("can not connect Aibril conversation server >> {}".format(e))
-            return False
-
-        return True
 
     def conversation(self, client_info):
-        is_succeed = True
 
         stt_text = client_info['stt_text']
         context = client_info['watson_context']
 
-        if self.__convert is None:
-            is_succeed = self.connect()
-
-        if is_succeed:
-
+        try:
             response = self.__convert.message(
                 workspace_id=WATSON['watson_workspace'],
                 message_input={'text': stt_text},
                 context=context
             )
+        except Exception as e:
+            self.connect()
+            print('AIBRIL: conversation [ {} ]'.format(e))
+
+            header = {'command': 'chat'}
+            language = 'ko'
+            watson_response = '에이브릴에 접속할 수가 없어요'
+
+        else:
 
             # response type 출력 해볼 것, json parsing 이 딱히 필요 없을 수도
             json_response = json.dumps(response, indent=2, ensure_ascii=False)
@@ -51,8 +53,15 @@ class WatsonConversation:
             try:
                 # ==================================================
                 # Parsing response
+                # 얘만 따로 try, catch 로 감싸서 text 가 없는 경우에도 대비해야 한다.
+                # 답이 없을 수도 있다. header 를 먼저 받아와야 한다.
+                # header > text > language 순으로 정의해야한다.
                 # ==================================================
                 result_conv = dict_response['output']['text'][0]
+                # check this action
+                # 다음 문장 추가해서 읽는 것 같은데, 이건 왜 하는 건가?
+                # 아래 두 줄은 없어도 동작이 잘 되었었다.
+                # 여러개의 문장을 읽어와서 연결하도록 하기 위해 사용 하는 것 같다.
                 if len(dict_response['output']['text']) > 1:
                     result_conv += " " + dict_response['output']['text'][1]
             except Exception as e:
@@ -68,6 +77,9 @@ class WatsonConversation:
 
                 # ==================================================
                 #  Update context
+                # context 안에 변수 넣어서 에이브릴에서 사용하게 할 수 있음.
+                # 딕셔너리 value 안에 리스트 혹은 딕셔너리로 사용.
+                # 사용 후에 value 삭제 후  update.
                 # ==================================================
             context.update(dict_response['context'])
 
@@ -101,11 +113,6 @@ class WatsonConversation:
                 language = 'ko'
             # --------------------------------------------------
 
-            client_info['watson_response'] = result_conv
+            watson_response = result_conv
 
-        else:
-            header = {'command': 'chat'}
-            language = 'ko'
-            client_info['watson_response'] = '에이브릴에 접속할 수가 없어요'
-
-        return header, language
+        return header, language, watson_response

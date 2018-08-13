@@ -6,6 +6,8 @@ import sys
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+# [END import_libraries]s
+
 import speech_recognition as sr
 
 from __configure.mubby_value import STT_FILE_NAME
@@ -15,26 +17,28 @@ RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
 
 
-class SpeechToText:
+class SpeechToText(object):
+    "  stt utils call "
     def __init__(self):
         pass
 
-    def speech_to_text(self, client_info, stt_api=None, socket_action=None):
+    def speech_to_text(self, client_info, stt_api='google_streaming', socket_action=None):
+        " choice stt file or streaming "
         file_name = client_info['folder_path'] + STT_FILE_NAME
-        stt_text = ''
 
-        if stt_api:
-            if stt_api == "google":
+        try:
+            if stt_api == 'google':
                 stt_text = self.google_stt(file_name)
-            elif stt_api == "google_streaming":
+            elif stt_api == 'google_streaming' and socket_action is not None:
                 stt_text = self.google_stt_streaming(socket_action)
             else:
-                print("그런 건 없어 스트리밍 시켜줄게")
-                stt_text = self.google_stt(file_name)
-        else:
-            stt_text = self.google_stt(file_name)
+                raise AttributeError
 
-        client_info['stt_text'] = stt_text
+        except Exception as exc:
+            stt_text = ''
+            print('STT: speech_to_text [ {} ]'.format(exc))
+
+        return stt_text
 
     def google_stt(self, file_name):
         print("file_name >> {}".format(file_name))
@@ -136,4 +140,5 @@ class SpeechToText:
 
             # Now, put the transcription responses to use.
             stt_text = self.listen_print_loop(responses)
+            # 아무말도 안 하면 어떻게 될까 궁금하네 해보자.
             return stt_text
